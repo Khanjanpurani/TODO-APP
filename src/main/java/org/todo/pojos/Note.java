@@ -1,26 +1,33 @@
 package org.todo.pojos;
 
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 
+import java.time.LocalDateTime;
+
+@Entity//this tells spring hibernate to manage it as tabel schema and class name is table name
 public class Note {
 
 
-    //id
-    //title
-    //content
-    //emoji
-    //createdAt
+    @Id//Tells this is primary key in table
+    @GeneratedValue(strategy = GenerationType.IDENTITY)//For auto incrementing the id
     private int id;
     private String title;
     private String content;
-    private long createdAt;
+    private LocalDateTime createdAt;
     private String emoji;
 
-    public Note(int id, String title, String content, long createdAt, String emoji) {
-        this.id = id;
+    //Hibernate requires no args constructor for themselves to create  the object
+    public Note() {
+    }
+
+    public Note( String title, String content, String emoji) {
         this.title = title;
         this.content = content;
-        this.createdAt = createdAt;
+        this.createdAt = LocalDateTime.now();
         this.emoji = emoji;
     }
 
@@ -57,11 +64,11 @@ public class Note {
         this.emoji = emoji;
     }
 
-    public long getCreatedAt() {
+    public LocalDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(long createdAt) {
+    public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
 }
