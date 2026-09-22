@@ -9,5 +9,6 @@ import org.todo.pojos.Note;
 // That implementation is registered as a Spring bean and linked to the NOTE table.
 // JpaRepository<Note, Integer> means — manage Note entity whose primary key is Integer.
 // We get save(), findById(), findAll(), deleteById(), existsById() etc for free.
+//JpaRepository<Note,Integer> - note -entity being managed, integer its primary key
 public interface NoteRepository extends JpaRepository<Note,Integer> {
 }

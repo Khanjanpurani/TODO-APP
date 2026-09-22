@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.todo.pojos.Note;
 import org.todo.repository.NoteRepository;
+import org.todo.service.NoteService;
 
 import java.util.Optional;
 
@@ -17,8 +18,10 @@ import java.util.Optional;
 @RestController
 public class NotesController {
 
+//    @Autowired
+//     NoteRepository noteRepository;
     @Autowired
-     NoteRepository noteRepository;
+    NoteService noteService;//This is field injection
 //    private List<Note> notes;
 //    private int noteID=0;
 
@@ -29,7 +32,8 @@ public class NotesController {
     @RequestMapping(value = "/add",method = {RequestMethod.POST,RequestMethod.GET})
     ResponseEntity<String> addNotes(@RequestParam (name = "title") String title,@RequestParam(value = "content" ) String content,@RequestParam(value = "emoji",required = false) String emoji ){
         //notes.add(new Note(title,content,emoji));
-        noteRepository.save(new Note(title,content,emoji));
+//        noteRepository.save(new Note(title,content,emoji));
+        noteService.addNote(title, content, emoji);
         return ResponseEntity.status(HttpStatus.OK).body("note added successfully");
        // return ResponseEntity.ok("note added successfully");
     }
@@ -37,13 +41,19 @@ public class NotesController {
     @RequestMapping(value = "/remove",method = {RequestMethod.POST,RequestMethod.GET})
     ResponseEntity<String> removeNotes(@RequestParam(value = "id") int noteID){
 
-
-        if(noteRepository.existsById(noteID)){
-            noteRepository.deleteById(noteID);
+        if(noteService.doesNoteExist(noteID)){
+            noteService.deleteNote(noteID);
             return ResponseEntity.status(HttpStatus.OK).body("note removed successfully");
         }else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("note not present");
         }
+
+//        if(noteRepository.existsById(noteID)){
+//            noteRepository.deleteById(noteID);
+//            return ResponseEntity.status(HttpStatus.OK).body("note removed successfully");
+//        }else {
+//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("note not present");
+//        }
 //        boolean removed = notes.removeIf(note -> note.getId() == noteID);
 //        if(removed){
 //            return ResponseEntity.status(HttpStatus.OK).body("note removed successfully");
@@ -56,11 +66,17 @@ public class NotesController {
     @RequestMapping(value = "/view")
     ResponseEntity<?> showNotes(){
 
-        if(!(noteRepository.count() == 0)){
-            return ResponseEntity.status(HttpStatus.OK).body(noteRepository.findAll());
+        if(noteService.doesAnyNoteExist()){
+            return ResponseEntity.status(HttpStatus.OK).body(noteService.getAllNotes());
         }else {
             return ResponseEntity.status(HttpStatus.OK).body("NO notes Present");
         }
+
+//        if(!(noteRepository.count() == 0)){
+//            return ResponseEntity.status(HttpStatus.OK).body(noteRepository.findAll());
+//        }else {
+//            return ResponseEntity.status(HttpStatus.OK).body("NO notes Present");
+//        }
 //        if(notes.isEmpty())
 //        {
 //            return ResponseEntity.status(HttpStatus.OK).body("NO notes Present");
@@ -72,16 +88,28 @@ public class NotesController {
     @RequestMapping(value = "/edit",method = {RequestMethod.GET,RequestMethod.POST})
     ResponseEntity<String> editNote(@RequestParam(value = "id") int noteID ,@RequestParam (name = "title",required = false) String title,@RequestParam(value = "content" ,required = false ) String content,@RequestParam(value = "emoji", required = false) String emoji) {
 
-       Optional<Note> note = noteRepository.findById(noteID);
-       if(note.isEmpty()){
+        Optional<Note>note = noteService.getNoteById(noteID);
+        if(note.isEmpty()){
            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No such note found");
        }else {
-           Note toUpdateNote =  note.get();
+            Note toUpdateNote =  note.get();
            if(title != null) toUpdateNote.setTitle(title);
            if(content != null)  toUpdateNote.setContent(content);
            if(emoji != null) toUpdateNote.setEmoji(emoji);
-           noteRepository.save(toUpdateNote);
+           noteService.saveUpdatedNote(toUpdateNote);
            return ResponseEntity.status(HttpStatus.OK).body("Note edited successfully");
+           }
+
+//       Optional<Note> note = noteRepository.findById(noteID);
+//       if(note.isEmpty()){
+//           return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No such note found");
+//       }else {
+//           Note toUpdateNote =  note.get();
+//           if(title != null) toUpdateNote.setTitle(title);
+//           if(content != null)  toUpdateNote.setContent(content);
+//           if(emoji != null) toUpdateNote.setEmoji(emoji);
+//           noteRepository.save(toUpdateNote);
+//           return ResponseEntity.status(HttpStatus.OK).body("Note edited successfully");
 
 
        }
@@ -95,6 +123,6 @@ public class NotesController {
 //        }
 //            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No such note found");
 
-    }
+
 
 }
