@@ -2,6 +2,8 @@ package org.todo.service;
 
 
 import org.springframework.stereotype.Service;
+import org.todo.dto.NoteResponse;
+import org.todo.exception.NoteNotFoundException;
 import org.todo.pojos.Note;
 import org.todo.repository.NoteRepository;
 
@@ -34,8 +36,9 @@ public class NoteService {
         noteRepository.deleteById(id);
     }
 
-    public Optional<Note> getNoteById(int id) {
-        return noteRepository.findById(id);
+    public Note getNoteById(int id) {
+        return noteRepository.findById(id)
+                .orElseThrow(() -> new NoteNotFoundException(id));
     }
 
     public boolean doesNoteExist(int noteID){
@@ -44,5 +47,13 @@ public class NoteService {
 
     public boolean doesAnyNoteExist(){
         return !(noteRepository.count() ==0);
+    }
+
+    public NoteResponse convertToResponse(Note note) {
+        return new NoteResponse(note.getId(), note.getTitle(), note.getContent(), note.getCreatedAt(), note.getEmoji());
+    }
+
+    public List<NoteResponse> convertToResponseList(List<Note> notes){
+        return notes.stream().map(this::convertToResponse).toList();
     }
 }
