@@ -29,7 +29,7 @@ public class NoteService {
     }
 
     public List<Note> getAllNotes() {
-        return noteRepository.findAll();
+        return noteRepository.findAllByOrderByPinnedDescCreatedAtDesc();
     }
 
     public void deleteNote(int id) {
@@ -50,10 +50,25 @@ public class NoteService {
     }
 
     public NoteResponse convertToResponse(Note note) {
-        return new NoteResponse(note.getId(), note.getTitle(), note.getContent(), note.getCreatedAt(), note.getEmoji());
+        return new NoteResponse(note.getId(), note.getTitle(), note.getContent(), note.getCreatedAt(), note.getEmoji(),note.isPinned());
     }
 
     public List<NoteResponse> convertToResponseList(List<Note> notes){
         return notes.stream().map(this::convertToResponse).toList();
+    }
+    public void togglePin(int id) {
+        Note note = getNoteById(id);
+        note.setPinned(!note.isPinned());
+        noteRepository.save(note);
+    }
+
+    public List<Note> searchNotes(String keyword) {
+
+        return noteRepository
+                .findByTitleContainingIgnoreCaseOrContentContainingIgnoreCaseOrEmojiContaining(
+                        keyword,
+                        keyword,
+                        keyword
+                );
     }
 }

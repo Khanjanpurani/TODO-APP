@@ -19,6 +19,7 @@ public class Note {
     private String content;
     private LocalDateTime createdAt;
     private String emoji;
+    private boolean pinned;
 
     //Hibernate requires no args constructor for themselves to create  the object
     public Note() {
@@ -29,6 +30,7 @@ public class Note {
         this.content = content;
         this.createdAt = LocalDateTime.now();
         this.emoji = emoji;
+        this.pinned = false;
     }
 
 
@@ -70,5 +72,13 @@ public class Note {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public boolean isPinned() {
+        return pinned;
+    }
+
+    public void setPinned(boolean pinned) {
+        this.pinned = pinned;
     }
 }

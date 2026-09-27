@@ -10,6 +10,8 @@ import org.todo.exception.NoteNotFoundException;
 import org.todo.pojos.Note;
 import org.todo.service.NoteService;
 
+import java.util.List;
+
 
 @RestController
 public class NotesController {
@@ -79,6 +81,22 @@ public class NotesController {
         return ResponseEntity.status(HttpStatus.OK).body("Note edited successfully");
     }
 
+    @RequestMapping(value = "/notes/{id}/pin", method = RequestMethod.PATCH)
+    ResponseEntity<String> togglePin(@PathVariable("id") int noteID) {
 
+        noteService.togglePin(noteID);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body("Note pin status updated successfully");
+    }
+
+    @GetMapping(value = {"notes/search"})
+    ResponseEntity<?>searchNotes(@RequestParam ("keyword") String keyword){
+        List<Note> notes = noteService.searchNotes(keyword);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(noteService.convertToResponseList(notes));
+    }
 
 }

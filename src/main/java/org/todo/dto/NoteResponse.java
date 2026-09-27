@@ -9,17 +9,19 @@ public class NoteResponse {
     private String content;
     private LocalDateTime createdAt;
     private String emoji;
+    private boolean pinned;
 
     public NoteResponse() {
     }
 
     public NoteResponse(int id, String title, String content,
-                        LocalDateTime createdAt, String emoji) {
+                        LocalDateTime createdAt, String emoji,boolean pinned) {
         this.id = id;
         this.title = title;
         this.content = content;
         this.createdAt = createdAt;
         this.emoji = emoji;
+        this.pinned = pinned;
     }
 
     public int getId() {
@@ -60,5 +62,13 @@ public class NoteResponse {
 
     public void setEmoji(String emoji) {
         this.emoji = emoji;
+    }
+
+    public boolean isPinned() {
+        return pinned;
+    }
+
+    public void setPinned(boolean pinned) {
+        this.pinned = pinned;
     }
 }
