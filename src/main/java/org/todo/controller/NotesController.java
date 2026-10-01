@@ -5,10 +5,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.todo.dto.NoteRequest;
 import org.todo.exception.NoteNotFoundException;
 import org.todo.pojos.Note;
 import org.todo.service.NoteService;
+import org.todo.service.StorageService;
 
 import java.util.List;
 
@@ -20,6 +22,8 @@ public class NotesController {
 //     NoteRepository noteRepository;
     @Autowired
     NoteService noteService;//This is field injection
+    @Autowired
+    StorageService storageService;
 //    private List<Note> notes;
 //    private int noteID=0;
 
@@ -97,6 +101,19 @@ public class NotesController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(noteService.convertToResponseList(notes));
+    }
+
+    //FILE UPLOAD
+    @PostMapping("/notes/{id}/attachments")
+    ResponseEntity<String> uploadFile(@PathVariable("id") int noteID, @RequestParam("file") MultipartFile file) {
+
+        Note note = noteService.getNoteById(noteID);
+
+        storageService.store(file, note);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body("File uploaded successfully");
     }
 
 }
