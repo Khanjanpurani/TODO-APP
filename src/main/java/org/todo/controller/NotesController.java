@@ -2,12 +2,15 @@ package org.todo.controller;
 
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.todo.dto.NoteRequest;
 import org.todo.exception.NoteNotFoundException;
+import org.todo.pojos.Attachment;
 import org.todo.pojos.Note;
 import org.todo.service.NoteService;
 import org.todo.service.StorageService;
@@ -116,4 +119,48 @@ public class NotesController {
                 .body("File uploaded successfully");
     }
 
+    //List All attachments of the Note
+    @GetMapping("/notes/{id}/attachments")
+    ResponseEntity<?> getAttachments(@PathVariable("id") int noteID) {
+
+        Note note = noteService.getNoteById(noteID);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(storageService.getAllAttachmentByNote(note));
+    }
+
+    //Download Attachment
+    @GetMapping("/notes/{noteId}/attachments/{attachmentId}")
+    ResponseEntity<byte[]> downloadAttachment(
+            @PathVariable int noteId,
+            @PathVariable int attachmentId) {
+
+        Note note = noteService.getNoteById(noteId);
+
+        Attachment attachment = storageService.getAttachment(note, attachmentId);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .contentType(MediaType.parseMediaType(attachment.getContentType()))
+                .header(
+                        HttpHeaders.CONTENT_DISPOSITION,
+                        "attachment; filename=\"" + attachment.getOriginalFileName() + "\""
+                )
+                .body(attachment.getData());
+    }
+
+    @DeleteMapping("/notes/{noteId}/attachments/{attachmentId}")
+    ResponseEntity<String> deleteAttachment(
+            @PathVariable int noteId,
+            @PathVariable int attachmentId) {
+
+        Note note = noteService.getNoteById(noteId);
+
+        storageService.deleteAttachment(note, attachmentId);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body("Attachment deleted successfully");
+    }
 }

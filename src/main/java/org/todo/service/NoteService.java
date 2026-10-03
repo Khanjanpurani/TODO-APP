@@ -4,7 +4,9 @@ package org.todo.service;
 import org.springframework.stereotype.Service;
 import org.todo.dto.NoteResponse;
 import org.todo.exception.NoteNotFoundException;
+import org.todo.pojos.Attachment;
 import org.todo.pojos.Note;
+import org.todo.repository.AttachmentRepository;
 import org.todo.repository.NoteRepository;
 
 import java.util.List;
@@ -14,11 +16,13 @@ import java.util.Optional;
 public class NoteService {
 
     private final NoteRepository noteRepository;
+    private final AttachmentRepository attachmentRepository;
 
 
     //CONSTRUCTOR INJECTION
-    public NoteService(NoteRepository noteRepository){
+    public NoteService(NoteRepository noteRepository, AttachmentRepository attachmentRepository) {
         this.noteRepository = noteRepository;
+        this.attachmentRepository = attachmentRepository;
     }
 
     public void addNote(String title,String content,String emoji){
@@ -33,6 +37,15 @@ public class NoteService {
     }
 
     public void deleteNote(int id) {
+        Optional<Note> note = noteRepository.findById(id);
+        if (note.isEmpty()) {
+            throw new NoteNotFoundException(id);
+        }
+
+        List<Attachment> attachmentList = attachmentRepository.findByNote(note.get());
+        for(Attachment attachment:attachmentList){
+            attachmentRepository.deleteById(attachment.getId());
+        }
         noteRepository.deleteById(id);
     }
 
