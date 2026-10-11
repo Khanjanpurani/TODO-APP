@@ -5,6 +5,8 @@ import org.h2.server.web.JakartaWebServlet;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 
 @Configuration
@@ -17,13 +19,19 @@ public class SpringConfigs {
 //        return new ArrayList<>();
 //    }
 
-    //By default jetty does not show h2 ui so added this config
+    //By default, jetty does not show h2 ui so added this config
     @Bean
     public ServletRegistrationBean<JakartaWebServlet> h2Console() {
         ServletRegistrationBean<JakartaWebServlet> bean =
                 new ServletRegistrationBean<>(new JakartaWebServlet(), "/h2-console/*");
         bean.addInitParameter("webAllowOthers", "true");
         return bean;
+    }
+
+    // Password hashing configuration
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 }
 

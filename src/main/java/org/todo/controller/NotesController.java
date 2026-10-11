@@ -120,6 +120,7 @@ public class NotesController {
     }
 
     //List All attachments of the Note
+    //TODO THIS ENDPOINT SENDS FILE DATA AS WELL IN RESPONSE REMOVE THAT SEND ONLY METADATA
     @GetMapping("/notes/{id}/attachments")
     ResponseEntity<?> getAttachments(@PathVariable("id") int noteID) {
 
